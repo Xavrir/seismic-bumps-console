@@ -1,0 +1,2 @@
+model,variant,split,seed,threshold,hazardous_precision,hazardous_recall,hazardous_f1,hazardous_f2,roc_auc,accuracy,tn,fp,fn,tp,hyperparams_json
+logreg,class_weight_balanced,test,42,0.55,0.21428571428571427,0.5769230769230769,0.3125,0.43103448275862066,0.7374628134296642,0.8298969072164949,307,55,11,15,"{""class_weight"": ""balanced"", ""max_iter"": 1000, ""solver"": ""lbfgs""}"
