@@ -1,7 +1,7 @@
 """
 Train and evaluate a Logistic Regression baseline on the Seismic Bumps dataset.
 
-Teaching note: Logistic Regression is our baseline because it is interpretable
+Logistic Regression is our baseline because it is interpretable
 and linear. If a complex model only beats it modestly, the data may not need
 much complexity. Starting here gives us a meaningful benchmark.
 """
@@ -179,17 +179,6 @@ def main():
     )
     plt.close("all")
 
-    # Teaching moment
-    print()
-    print("--- WHY THRESHOLD TUNING MATTERS ---")
-    print(
-        "We select the decision threshold on the validation set instead of using the"
-        " default 0.5 because the classes are highly imbalanced (only ~6.6% hazardous)."
-        " A lower threshold increases recall — catching more truly hazardous seismic"
-        " events — at the cost of more false alarms. In safety-critical problems like"
-        " this, missing a hazardous event (false negative) is far worse than a false"
-        " alarm, so we optimize for F2 which weights recall twice as heavily as precision."
-    )
 
 
 if __name__ == "__main__":
