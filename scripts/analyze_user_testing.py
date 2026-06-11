@@ -55,6 +55,18 @@ TASK_LABELS = {
     "t4": "T4 Upload CSV",
     "t5": "T5 Recall & threshold",
 }
+SUS_ITEM_LABELS = {
+    1: "Would use often",
+    2: "Not too complex",
+    3: "Easy to use",
+    4: "No tech help needed",
+    5: "Well integrated",
+    6: "Consistent (not messy)",
+    7: "Quick to learn",
+    8: "Not awkward",
+    9: "Felt confident",
+    10: "Little to learn first",
+}
 SUCCESS_MAP = {"selesai": 1.0, "sebagian": 0.5, "gagal": 0.0}
 
 # Fallback: match a raw Google Forms header by its question text (case-insensitive
@@ -146,6 +158,34 @@ def plot_sus(pids, sus, outdir: Path) -> None:
     _style_axis(ax)
     fig.tight_layout()
     fig.savefig(outdir / "sus_per_participant.png", dpi=150, facecolor="white")
+    plt.close(fig)
+
+
+def plot_sus_items(df: pd.DataFrame, outdir: Path) -> None:
+    """One chart for all 10 SUS items, normalized so higher always = better usability."""
+    cols = {c: _numeric(df, c) for c in SUS_CODES}
+    if any(s.empty for s in cols.values()):
+        return
+    labels, values = [], []
+    for i, code in enumerate(SUS_CODES, start=1):
+        mean = float(cols[code].mean())
+        contrib = (mean - 1) if i % 2 == 1 else (5 - mean)  # 0..4, higher = better
+        labels.append(SUS_ITEM_LABELS[i])
+        values.append(contrib / 4 * 100)
+
+    fig, ax = plt.subplots(figsize=(8, 5.5))
+    colors = [C_GREEN if v >= 75 else C_ORANGE if v >= 50 else C_RED for v in values]
+    ax.barh(labels, values, color=colors, edgecolor=C_INK, linewidth=0.6)
+    for y, v in enumerate(values):
+        ax.text(v + 1.5, y, f"{v:.0f}", va="center", fontsize=9, color=C_INK)
+    ax.set_xlim(0, 100)
+    ax.set_xlabel("favorability (0-100, higher = better usability)")
+    ax.set_title("SUS per item (normalized so higher = better)")
+    ax.invert_yaxis()
+    _style_axis(ax)
+    ax.grid(axis="x", color="#e6e3e3", linewidth=0.8)
+    fig.tight_layout()
+    fig.savefig(outdir / "sus_items.png", dpi=150, facecolor="white")
     plt.close(fig)
 
 
@@ -340,6 +380,7 @@ def main() -> None:
 
     if not sus.empty:
         plot_sus(pids, sus, outdir)
+        plot_sus_items(df, outdir)
     if use_means:
         plot_usefulness(use_means, outdir)
     if diff_means and success_rates:
